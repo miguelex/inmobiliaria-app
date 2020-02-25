@@ -23,7 +23,31 @@ const style = {
     }
 }
 class RegistrarUsuario extends Component {
+    
+    state = {
+        usuario : {
+            nombre : '',
+            apellidos : '',
+            email : '',
+            password : ''
+        }
+    }
+
+    onChange = e => {
+        let usuario = Object.assign({}, this.state.usuario);
+        usuario[e.target.name] = e.target.value;
+        this.setState({
+            usuario : usuario
+        })
+    }
+
+    registrarUsuario = e => {
+        e.preventDefault();
+        console.log('Imprimir objeto usuario del state', this.state.usuario);
+    }
+
     render() {
+
         return (
             <Container maxWidth="md">
                 <div style ={style.paper}>
@@ -36,21 +60,21 @@ class RegistrarUsuario extends Component {
                     <form style ={style.form}>
                         <Grid container spacing = {2}>
                             <Grid item md = {6}  xs = {12}>
-                                <TextField name="nombre" fullWidth label="Ingrese su nombre" />
+                                <TextField name="nombre" onChange = {this.onChange} value={this.state.usuario.nombre} fullWidth label="Ingrese su nombre" />
                             </Grid>
                             <Grid item md = {6}  xs = {12}>
-                                <TextField name="apellidos" fullWidth label="Ingrese sus apellidos" />
+                                <TextField name="apellidos" onChange = {this.onChange} value={this.state.usuario.apellidos} fullWidth label="Ingrese sus apellidos" />
                             </Grid>
                             <Grid item md = {6}  xs = {12}>
-                                <TextField name="email" fullWidth label="Ingrese su correo electrónico" />
+                                <TextField name="email" onChange = {this.onChange} value  ={this.state.usuario.email} fullWidth label="Ingrese su correo electrónico" />
                             </Grid>
                             <Grid item md = {6}  xs = {12}>
-                                <TextField type="password" name="password" fullWidth label="Ingrese su password" />
+                                <TextField type="password" name="password" onChange = {this.onChange} value  ={this.state.usuario.password} fullWidth label="Ingrese su password" />
                             </Grid>
                         </Grid>
                         <Grid container justify="center">
                             <Grid item md = {6}  xs = {12}>
-                                <Button type="submit" variant="contained" fullWidth size="large" color="primary" style={style.submit}>
+                                <Button type="submit" onClick={this.registrarUsuario} variant="contained" fullWidth size="large" color="primary" style={style.submit}>
                                     Registrar
                                 </Button>
                             </Grid>
