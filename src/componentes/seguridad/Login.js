@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Avatar, Typography, TextField, Button } from '@material-ui/core';
 import LockOutLineIcon from '@material-ui/icons/LockOutlined';
+import { consumerFirebase } from '../../server';
+import { compose } from 'recompose';
 
 const style = {
     paper :{
@@ -21,6 +23,47 @@ const style = {
     }
 }
 class Login extends Component {
+
+    state = {
+        firebase : null,
+        usuario : {
+            email : '',
+            password : ''
+        }
+    }
+
+    static getDerivedStateFromProps (nextProps, prevState){
+
+        if(nextProps.firebase === prevState.firebase){
+            return null;
+        }
+        return {
+            firebase : nextProps.firebase
+        }
+    }
+
+    onChange = e => {
+        e.preventDefault();
+        let usuario = Object.assign({}, this.state.usuario);
+        usuario[e.target.name] = e.target.value;
+        this.setState({
+            usuario : usuario
+        }) 
+    }
+
+    login = e => {
+        const { firebase , usuario} = this.state;
+
+        firebase.auth
+        .signInWithEmailAndPassword(usuario.email, usuario.password)
+        .then(auth =>{
+            this.props.history.push("/");
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
     render() {
         return (
             <Container maxWidth="xs">
@@ -38,6 +81,8 @@ class Login extends Component {
                             name ="email"
                             fullWidth
                             margin = "normal"
+                            onChange = {this.onChange}
+                            value = {this.state.usuario.email}
                         />
                         <TextField 
                             variant ="outlined"
@@ -46,12 +91,15 @@ class Login extends Component {
                             type = "password"
                             fullWidth
                             margin = "normal"
+                            onChange = {this.onChange}
+                            value = {this.state.usuario.password}
                         />
                         <Button
                             type ="submit"
                             fullWidth
                             variant ="contained"
                             color = "primary"
+                            onClick = {this.login}
                         >
                             Enviar
                         </Button>
@@ -62,4 +110,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default compose(consumerFirebase)(Login);

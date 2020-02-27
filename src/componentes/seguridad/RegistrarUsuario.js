@@ -25,12 +25,6 @@ const style = {
     }
 }
 
-const usuarioInicial = {
-    nombre : '',
-    apellidos : '',
-    email : '',
-    password : ''
-} 
 
 class RegistrarUsuario extends Component {
     
@@ -53,6 +47,7 @@ class RegistrarUsuario extends Component {
             firebase : nextProps.firebase
         }
     }
+
     onChange = e => {
         let usuario = Object.assign({}, this.state.usuario);
         usuario[e.target.name] = e.target.value;
@@ -65,18 +60,33 @@ class RegistrarUsuario extends Component {
         e.preventDefault();
         console.log('Imprimir objeto usuario del state', this.state.usuario);
         const {usuario , firebase} = this.state;
-        firebase.db
-        .collection("Users")
-        .add(usuario)
-        .then(usuarioAfter => {
-            console.log('Esta insercción fue un exito', usuarioAfter)
-            this.setState({
-                usuario : usuarioInicial
+        
+        firebase.auth
+        .createUserWithEmailAndPassword(usuario.email, usuario.password)
+        .then(auth => {
+
+            const usuarioDB = {
+                usuarioId : auth.user.uid,
+                email : usuario.email,
+                nombre : usuario.nombre,
+                apellidos: usuario.apellidos
+            };
+
+            firebase.db
+            .collection("Users")
+            .add(usuarioDB)
+            .then(usuarioAfter => {
+                console.log('Esta insercción fue un exito', usuarioAfter)
+                this.props.history.push("/");
+            })
+            .catch(error => {
+                console.log('Error', error)
             })
         })
-        .catch(error => {
+        .catch (error => {
             console.log('Error', error)
         })
+        
     }
 
     render() {
