@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import Grid from '@material-ui/core/Grid';
 import './App.css';
 import ListaInmuebles from './componentes/vistas/ListaInmuebles';
@@ -8,11 +8,20 @@ import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import theme from './theme/theme';
 import RegistrarUsuario from './componentes/seguridad/RegistrarUsuario';
 import Login from './componentes/seguridad/Login';
+import { FirebaseContext } from './server';
 
-class App extends Component {
-  render (){
-    return(
-      <Router>
+function App(props) {
+  let firebase = React.useContext(FirebaseContext);
+  const [autenticacionIniciada, setupFirebaseInicial] = React.useState(false);
+
+  useEffect(() => {
+    firebase.estaIniciado().then(val => {
+      setupFirebaseInicial(val);
+    })
+  })
+
+  return autenticacionIniciada !== false ? (
+    <Router>
         <MuiThemeProvider theme={theme}>
         <AppNavbar />
         <Grid container>
@@ -23,10 +32,9 @@ class App extends Component {
           </Switch>
         </Grid>
       </MuiThemeProvider>
-      </Router>
-      
-    )
-  }  
+      </Router>  
+  )
+  : null;
 }
 
 export default App;
