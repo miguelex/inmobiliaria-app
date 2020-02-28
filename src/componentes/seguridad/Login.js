@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Avatar, Typography, TextField, Button } from '@material-ui/core';
 import LockOutLineIcon from '@material-ui/icons/LockOutlined';
-import { consumerFirebase } from '../../server';
 import { compose } from 'recompose';
+import { consumerFirebase } from '../../server';
 
 const style = {
     paper :{
@@ -43,7 +43,7 @@ class Login extends Component {
     }
 
     onChange = e => {
-        e.preventDefault();
+        
         let usuario = Object.assign({}, this.state.usuario);
         usuario[e.target.name] = e.target.value;
         this.setState({
@@ -52,6 +52,7 @@ class Login extends Component {
     }
 
     login = e => {
+        e.preventDefault();
         const { firebase , usuario} = this.state;
 
         firebase.auth
