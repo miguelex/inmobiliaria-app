@@ -7,5 +7,5 @@ export const initialState = {
         id : "",
         telefono: ""
     },
-    autenticaso : false
+    autenticado : false
 }
