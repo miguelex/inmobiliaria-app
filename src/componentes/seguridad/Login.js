@@ -3,9 +3,9 @@ import { Container, Avatar, Typography, TextField, Button } from '@material-ui/c
 import LockOutLineIcon from '@material-ui/icons/LockOutlined';
 import { compose } from 'recompose';
 import { consumerFirebase } from '../../server';
-import {iniciarSesion} from '../../sesion/actions/sesionAction';
-import {openMensajePantalla} from "../../sesion/actions/snackbarAction";
-import  {StateContext } from '../../sesion/store';
+import { iniciarSesion } from '../../sesion/actions/sesionAction';
+import { openMensajePantalla } from "../../sesion/actions/snackbarAction";
+import { StateContext } from '../../sesion/store';
 
 const style = {
     paper :{

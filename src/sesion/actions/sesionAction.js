@@ -15,11 +15,12 @@ export const iniciarSesion = (dispatch, firebase, email, password) => {
                     sesion : usuarioDB,
                     autenticado : true
                 })
-                resolve();
+                resolve({status: true});
             });
         })
         .catch(error => {
             console.log('error', error);
+            resolve({status: false, mensaje : error});
         })
     });
 };
@@ -37,7 +38,8 @@ export const crearUsuario = (dispatch, firebase, usuario) => {
                 email : usuario.email,
                 nombre : usuario.nombre,
                 apellidos : usuario.apellidos            
-            }, {merge : true}
+            }, 
+            {merge : true}
             )
             .then (doc => {
                 usuario.id = auth.user.uid;
@@ -46,13 +48,13 @@ export const crearUsuario = (dispatch, firebase, usuario) => {
                     sesion : usuario,
                     autenticado : true
                 });
-                resolve({status: true}); 
+                resolve({status : true}); 
             });
         })
         .catch(error => {
             console.log("error", error);
-            resolve({status: false, mensaje : error});
-        });
+            resolve({status: false, mensaje : error});         
+        })
     });
 };
 
