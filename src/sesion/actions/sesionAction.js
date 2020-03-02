@@ -24,7 +24,7 @@ export const iniciarSesion = (dispatch, firebase, email, password) => {
     });
 };
 
-export const crearUsuario = (dispatch, firebase, usuario => {
+export const crearUsuario = (dispatch, firebase, usuario) => {
     return new Promise((resolve,eject) => {
         firebase.auth
         .createUserWithEmailAndPassword(usuario.email, usuario.password)
@@ -46,14 +46,15 @@ export const crearUsuario = (dispatch, firebase, usuario => {
                     sesion : usuario,
                     autenticado : true
                 });
-                resolve(); 
+                resolve({status: true}); 
             });
         })
         .catch(error => {
             console.log("error", error);
+            resolve({status: false, mensaje : error});
         });
     });
-});
+};
 
 export const salirSesion = (dispatch, firebase) => {
     return new Promise ((resolve, eject) => {
