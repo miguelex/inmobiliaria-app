@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { Toolbar, Typography, Button, IconButton, Drawer } from '@material-ui/core';
+import { Toolbar, Typography, Button, IconButton, Drawer, Avatar } from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {consumerFirebase} from '../../../server';
 import {compose} from 'recompose';
 import {StateContext} from '../../../sesion/store';
 import {salirSesion} from '../../../sesion/actions/sesionAction';
 import {MenuDerecha} from './menuDerecha';
+import {MenuIzquierda} from './menuIzquierda';
+import {Link} from 'react-router-dom';
 import fotoUsuarioTemp from '../../../logo.svg';
 import {withRouter} from 'react-router-dom';
 const styles = theme => ({
@@ -44,7 +46,8 @@ class BarSession extends Component {
 
     state = {
         firebase : null,
-        right : false
+        right : false,
+        left: false
     }
 
     salirSesionApp = () => {
@@ -80,6 +83,19 @@ class BarSession extends Component {
         return (
             <div>
                 <Drawer
+                    open={this.state.left}
+                    onClose={this.toggleDrawer("left",false)}
+                    anchor="left"
+                >
+                    <div
+                        role="button"
+                        onClick={this.toggleDrawer("left",false)}
+                        onKeyDown={this.toggleDrawer("left",false)}
+                    >
+                        <MenuIzquierda classes={classes} />
+                    </div>
+                </Drawer>
+                <Drawer
                     open={this.state.right}
                     onClose={this.toggleDrawer("right",false)}
                     anchor="right"
@@ -93,15 +109,25 @@ class BarSession extends Component {
                     </div>
                 </Drawer>
                 <Toolbar>
-                    <IconButton color="inherit">
+                    <IconButton color="inherit" onClick={this.toggleDrawer("left", true)}>
                         <i className="material-icons">menu</i>
                     </IconButton> 
                     <Typography variant ="h6">
-                        MIGUE HOMES
+                        Migue Home
                     </Typography>
                     <div className = {classes.grow}></div>
                     <div className = {classes.sectionDesktop}>
-                        <Button color ="inherit">Login</Button>
+                        <IconButton color="inherit" component={Link} to ="">
+                            <i className="material-icons">mail_outline</i>
+                        </IconButton>
+                        <Button color ="inherit" onClick={this.salirSesionApp}>
+                            Salir
+                        </Button>
+                        <Button color ="inherit">{textoUsuario}</Button>
+                        <Avatar
+                            scr={fotoUsuarioTemp}
+                        >              
+                        </Avatar>
                     </div>
                     <div className = {classes.sectionMobile}>
                         <IconButton color="inherit"
