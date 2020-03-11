@@ -105,7 +105,7 @@ class BarSession extends Component {
                         onClick={this.toggleDrawer("right",false)}
                         onKeyDown={this.toggleDrawer("right",false)}
                     >
-                        <MenuDerecha classes={classes} usuario={usuario} textoUsuario={textoUsuario} fotoUsuario={fotoUsuarioTemp} salirSesion={this.salirSesionApp} />
+                        <MenuDerecha classes={classes} usuario={usuario} textoUsuario={textoUsuario} fotoUsuario={usuario.foto || fotoUsuarioTemp} salirSesion={this.salirSesionApp} />
                     </div>
                 </Drawer>
                 <Toolbar>
@@ -125,7 +125,7 @@ class BarSession extends Component {
                         </Button>
                         <Button color ="inherit">{textoUsuario}</Button>
                         <Avatar
-                            scr={fotoUsuarioTemp}
+                            scr={usuario.foto || fotoUsuarioTemp}
                         >              
                         </Avatar>
                     </div>

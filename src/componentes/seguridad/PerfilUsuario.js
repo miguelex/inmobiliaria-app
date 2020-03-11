@@ -11,6 +11,8 @@ import {
 import reactFoto from "../../logo.svg";
 import { consumerFirebase } from "../../server";
 import { openMensajePantalla } from "../../sesion/actions/snackbarAction";
+import ImageUploader from "react-images-upload";
+import uuid from "uuid";
 
 const style = {
   paper: {
@@ -57,13 +59,13 @@ const PerfilUsuario = props => {
     firebase.db
       .collection("Users")
       .doc(firebase.auth.currentUser.uid)
-      .set(estado, {merge: true})
+      .set(estado, { merge: true })
       .then(success => {
         dispatch({
           type: "INICIAR_SESION",
           sesion: estado,
           autenticado: true
-        })
+        });
 
         openMensajePantalla(dispatch, {
           open: true,
@@ -85,6 +87,52 @@ const PerfilUsuario = props => {
       }
     }
   });
+
+  const subirFoto = fotos => {
+    //primer paso--> Capturar la imagen
+    const foto = fotos[0];
+    //segundo paso --> renombrar la imagen
+    const claveUnicaFoto = uuid.v4();
+    //tercer paso --> Obtener el nombre de la foto
+    const nombreFoto = foto.name;
+    //cuarto paso --> Obtener la extension de la imagen
+    const extensionFoto = nombreFoto.split(".").pop();
+    // quinto paso --> Crear el nuevo nombre de la foto -alias
+    const alias = (
+      nombreFoto.split(".")[0] +
+      "_" +
+      claveUnicaFoto +
+      "." +
+      extensionFoto
+    )
+      .replace(/\s/g, "_")
+      .toLowerCase();
+
+    firebase.guardarDocumento(alias, foto).then(metadata => {
+      firebase.devolverDocumento(alias).then(urlFoto => {
+        estado.foto = urlFoto;
+
+        firebase.db
+          .collection("Users")
+          .doc(firebase.auth.currentUser.uid)
+          .set(
+            {
+              foto: urlFoto
+            },
+            { merge: true }
+          )
+          .then(userDB => {
+            dispatch({
+              type: "INICIAR_SESION",
+              sesion: estado,
+              autenticado: true
+            });
+          });
+      });
+    });
+  };
+
+  let fotoKey = uuid.v4();
 
   return sesion ? (
     <Container component="main" maxWidth="md" justify="center">
@@ -135,7 +183,19 @@ const PerfilUsuario = props => {
                 onChange={cambiarDato}
               />
             </Grid>
+            <Grid item xs={12} md={6}>
+              <ImageUploader
+                withIcon={false}
+                key={fotoKey}
+                singleImage={true}
+                buttonText="Seleciones su imagen de perfil"
+                onChange={subirFoto}
+                imgExtension={[".jpg", ".gif", ".png", ".jpeg"]}
+                maxFileSize={5242880}
+              />
+            </Grid>
           </Grid>
+
           <Grid container justify="center">
             <Grid item xs={12} md={6}>
               <Button
