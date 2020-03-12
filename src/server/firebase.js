@@ -29,7 +29,7 @@ class Firebase {
         })
     }
 
-    guardarDocumento = (nombreDocumento, documento)=> this.storage.refFromURL().child(nombreDocumento).put(documento);
+    guardarDocumento = (nombreDocumento, documento)=> this.storage.ref().child(nombreDocumento).put(documento);
 
     devolverDocumento = (documentoUrl) => this.storage.ref().child(documentoUrl).getDownloadURL();
 }

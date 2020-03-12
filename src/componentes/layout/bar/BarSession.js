@@ -125,7 +125,7 @@ class BarSession extends Component {
                         </Button>
                         <Button color ="inherit">{textoUsuario}</Button>
                         <Avatar
-                            scr={usuario.foto || fotoUsuarioTemp}
+                            src={usuario.foto || fotoUsuarioTemp}
                         >              
                         </Avatar>
                     </div>

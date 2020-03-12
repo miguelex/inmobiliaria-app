@@ -12,7 +12,7 @@ import reactFoto from "../../logo.svg";
 import { consumerFirebase } from "../../server";
 import { openMensajePantalla } from "../../sesion/actions/snackbarAction";
 import ImageUploader from "react-images-upload";
-import uuid from "uuid";
+import * as uuid from "uuid";
 
 const style = {
   paper: {
@@ -183,7 +183,7 @@ const PerfilUsuario = props => {
                 onChange={cambiarDato}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <ImageUploader
                 withIcon={false}
                 key={fotoKey}
