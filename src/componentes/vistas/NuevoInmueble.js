@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Paper, Grid, Breadcrumbs, Link, Typography, TextField, Button } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
+import {consumerFirebase} from '../../server'
+import { openMensajePantalla} from '../../sesion/actions/snackbarAction';
 
 const style = {
     container : {
@@ -33,6 +35,43 @@ const style = {
 }
 
 class NuevoInmueble extends Component {
+
+    state = {
+        inmueble : {
+            direccion : '',
+            ciudad : '',
+            pais: '',
+            descripcion : '',
+            interior : ''
+        }
+    }
+
+    entraDatoEnEstado = e => {
+        let inmueble_ = Object.assign({}, this.state.inmueble);
+        inmueble_[e.target.name] = e.target.value;
+        this.setState({
+            inmueble : inmueble_
+        })
+    }
+
+    guardarInmueble = () => {
+        const {inmueble} = this.state;
+
+        this.props.firebase.db
+        .collection("Inmuebles")
+        .add(inmueble)
+        .then(success => {
+            this.props.history("/")
+        })
+        .catch(error => {
+            openMensajePantalla({
+                open : true,
+                mensaeje : error
+            })
+        })
+
+    }
+
     render() {
         return (
             <Container style = {style.container}>
@@ -52,6 +91,8 @@ class NuevoInmueble extends Component {
                                 name="direccion"
                                 label="Direccion del inmueble"
                                 fullWidth
+                                onChange = {this.entraDatoEnEstado}
+                                value={this.state.inmueble.direccion}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -59,6 +100,8 @@ class NuevoInmueble extends Component {
                                 name="ciudad"
                                 label="Ciudad"
                                 fullWidth
+                                onChange = {this.entraDatoEnEstado}
+                                value={this.state.inmueble.ciudad}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -66,6 +109,8 @@ class NuevoInmueble extends Component {
                                 name="pais"
                                 label="País"
                                 fullWidth
+                                onChange = {this.entraDatoEnEstado}
+                                value={this.state.inmueble.pais}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -74,14 +119,18 @@ class NuevoInmueble extends Component {
                                 label="Descripcion del inmueble"
                                 fullWidth
                                 multiline
+                                onChange = {this.entraDatoEnEstado}
+                                value={this.state.inmueble.descripcion}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
-                                name="dinterior"
+                                name="interior"
                                 label="Interior del inmueble"
                                 fullWidth
                                 multiline
+                                onChange = {this.entraDatoEnEstado}
+                                value={this.state.inmueble.interior}
                             />
                         </Grid>
                     </Grid>
@@ -95,6 +144,7 @@ class NuevoInmueble extends Component {
                                 size="large"
                                 color="primary"
                                 style={style.submit}
+                                onClick={this.guardarInmueble}
                             >
                                 Guardar
                             </Button>
@@ -108,4 +158,4 @@ class NuevoInmueble extends Component {
     }
 }
 
-export default NuevoInmueble;
+export default consumerFirebase(NuevoInmueble);
