@@ -18,6 +18,7 @@ import { consumerFirebase } from "../../server";
 import { openMensajePantalla } from "../../sesion/actions/snackbarAction";
 import ImageUploader from "react-images-upload";
 import * as uuid from "uuid";
+import { crearKeyword } from "../../sesion/actions/Keyword";
 
 const style = {
   container: {
@@ -84,9 +85,26 @@ class NuevoInmueble extends Component {
   };
 
   guardarInmueble = () => {
-    const { inmueble } = this.state;
 
-    this.props.firebase.db
+    const { archivos, inmueble } = this.state;
+
+    // Creamos a cada imagen un alias
+
+    Object.keys(archivos).forEach(function(key){
+      let valorDinamico = Math.floor(new Date().getTime()/1000);
+      let nombre = archivos[key].name;
+      let extension = nombre.split(".").pop();
+      archivos[key].alias = (nombre.split(".")[0] + "_" + valorDinamico + "." +extension).replace(/\s/g,"_").toLowerCase();
+    })
+
+    const textoBusqueda = inmueble.direccion + ' '+ inmueble.ciudad + ' ' + inmueble.pais;
+    let keywords = crearKeyword(textoBusqueda);
+
+    this.props.firebase.guardarDocumentos(archivos).then(arregloUrls => {
+      inmueble.fotos = arregloUrls;
+      inmueble.keywords = keywords;
+
+      this.props.firebase.db
       .collection("Inmuebles")
       .add(inmueble)
       .then(success => {
@@ -98,6 +116,8 @@ class NuevoInmueble extends Component {
           mensaeje: error
         });
       });
+    })
+    
   };
 
   eliminarFoto = nombreFoto => () => {
