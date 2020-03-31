@@ -17,6 +17,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import { consumerFirebase } from "../../server";
 import { openMensajePantalla } from "../../sesion/actions/snackbarAction";
 import ImageUploader from "react-images-upload";
+import * as uuid from "uuid";
 
 const style = {
   container: {
@@ -89,7 +90,7 @@ class NuevoInmueble extends Component {
       .collection("Inmuebles")
       .add(inmueble)
       .then(success => {
-        this.props.history("/");
+        this.props.history.push("/");
       })
       .catch(error => {
         openMensajePantalla({
@@ -99,7 +100,17 @@ class NuevoInmueble extends Component {
       });
   };
 
+  eliminarFoto = nombreFoto => () => {
+    this.setState ({
+      archivos : this.state.archivos.filter(archivo => {
+        return archivo.name !== nombreFoto
+      })
+    })
+  } 
+
   render() {
+
+    let imagenKey = uuid.v4();
     return (
       <Container style={style.container}>
         <Paper style={style.paper}>
@@ -165,7 +176,7 @@ class NuevoInmueble extends Component {
           <Grid container justify="center">
             <Grid item xs={12} sm={6}>
               <ImageUploader
-                key={1000}
+                key={imagenKey}
                 withIcon={true}
                 buttonText="Seleccione imagenes"
                 onChange={this.subirFotos}
@@ -176,7 +187,7 @@ class NuevoInmueble extends Component {
             <Grid item xs={12} sm={6}>
               <Table>
                 <TableBody>
-                  {this.state.archivos.map((archivo, i) => {
+                  {this.state.archivos.map((archivo, i) => (
                     <TableRow key={i}>
                       <TableCell align="left">
                         <img src={archivo.urlTemp} style={style.foto} />
@@ -186,12 +197,13 @@ class NuevoInmueble extends Component {
                           variant="contained"
                           color="secondary"
                           size="small"
+                          onClick={this.eliminarFoto(archivo.name)}
                         >
                           Eliminar
                         </Button>
                       </TableCell>
-                    </TableRow>;
-                  })}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Grid>
