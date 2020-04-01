@@ -9,7 +9,7 @@ export const crearKeyword = text => {
         })
     })
 
-    let letraResumida;
+    let letraResumida="";
     text.split("").forEach(letra => {
         letraResumida += letra;
         arregloKeywords.push(letraResumida);
