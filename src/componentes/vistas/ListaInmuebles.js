@@ -13,7 +13,7 @@ const style = {
     paper : {
         backgroundColor : "#f5f5f5",
         padding: "20px",
-        height: 650 
+        minHeight: 650 
     },
     link: {
         display : "flex"
@@ -42,9 +42,44 @@ class ListaInmuebles extends Component {
     }
 
     cambiarBusquedaTexto = e => {
-        this.setState ({
+        const self =this;
+
+        self.setState({
             [e.target.name] :  e.target.value
-        }) 
+        })
+
+        if (self.state.typingTimeout){
+            clearTimeout(self.state.typingTimeout);
+        }
+
+        self.setState({
+            name: e.target.value,
+            typing: false,
+            typingTimeout: setTimeout (goTime => {
+                let objectQuery = this.props.firebase.db
+                .collection("Inmuebles")
+                .orderBy("direccion")
+                .where("keywords","array-contains", self.state.textoBusqueda.toLowerCase());
+
+                if(self.state.textoBusqueda.trim()===""){
+                    objectQuery = this.props.firebase.db
+                    .collection("Inmuebles")
+                    .orderBy("direccion")
+                }
+
+                objectQuery.get().then(snapshot =>{
+                    const arrayInmueble = snapshot.docs.map(doc => {
+                        let data = doc.data();
+                        let id = doc.id;
+                        return {id, ...data};
+                    })
+
+                    this.setState({
+                        inmuebles: arrayInmueble
+                    })
+                })
+            }, 500)
+        })
     }
 
     async componentDidMount(){
@@ -60,6 +95,25 @@ class ListaInmuebles extends Component {
 
         this.setState({
             inmuebles: arrayInmueble
+        })
+    }
+
+    eliminarInmueble = id =>{
+        this.props.firebase.db
+        .collection("Inmuebles")
+        .doc(id)
+        .delete()
+        .then(success => {
+            this.eliminarInmuebleDeListaEstado(id);
+        })
+    }
+
+    eliminarInmuebleDeListaEstado = id => {
+        const inmueblesListaNueva = this.state.inmuebles.filter(
+            inmueble => inmueble.id!=id
+        )
+        this.setState({
+            inmuebles: inmueblesListaNueva
         })
     }
     
@@ -121,6 +175,7 @@ class ListaInmuebles extends Component {
                                             <Button
                                                 size="small"
                                                 color="primary"
+                                                onClick={() => this.eliminarInmueble(card.id)}
                                             >
                                                 Eliminar
                                             </Button>
