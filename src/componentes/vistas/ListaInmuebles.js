@@ -116,6 +116,10 @@ class ListaInmuebles extends Component {
             inmuebles: inmueblesListaNueva
         })
     }
+
+    editarInmueble = id => {
+        this.props.history.push("/inmueble/" + id);
+    }
     
     render() {
         return (
@@ -169,6 +173,7 @@ class ListaInmuebles extends Component {
                                             <Button
                                                 size="small"
                                                 color="primary"
+                                                onClick={() => this.editarInmueble(card.id)}
                                             >
                                                 Editar
                                             </Button>

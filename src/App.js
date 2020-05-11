@@ -14,6 +14,7 @@ import { useStateValue } from './sesion/store';
 import RutaAutenticada from './componentes/seguridad/RutaAutenticada';
 import PerfilUsuario from './componentes/seguridad/PerfilUsuario';
 import NuevoInmueble from './componentes/vistas/NuevoInmueble';
+import EditarInmueble from './componentes/vistas/EditarInmueble';
 
 function App(props) {
   let firebase = React.useContext(FirebaseContext);
@@ -59,6 +60,7 @@ function App(props) {
               <RutaAutenticada exact path="/" autenticadoFirebase={firebase.auth.currentUser} component = {ListaInmuebles}/>
               <RutaAutenticada exact path="/auth/perfil" autenticadoFirebase={firebase.auth.currentUser} component = {PerfilUsuario}/>
               <RutaAutenticada exact path="/inmueble/nuevo" autenticadoFirebase={firebase.auth.currentUser} component = {NuevoInmueble}/>
+              <RutaAutenticada exact path="/inmueble/:id" autenticadoFirebase={firebase.auth.currentUser} component = {EditarInmueble}/>
               <Route path="/auth/registrarUsuario" exact component = {RegistrarUsuario}/>
               <Route path="/auth/login" exact component = {Login}/>
             </Switch>
