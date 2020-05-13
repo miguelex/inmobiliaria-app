@@ -3,6 +3,8 @@ import {consumerFirebase} from '../../server';
 import { Paper, Container, Grid, Breadcrumbs, Link, Typography, TextField, Button, Table, TableBody, TableRow, TableCell } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import ImageUploader from "react-images-upload";
+import * as uuid from "uuid";
+import {crearKeyword} from '../../sesion/actions/Keyword';
 
 const style ={
     container : {
@@ -56,13 +58,92 @@ class EditarInmueble extends Component {
 
     subirImagenes = imagenes => {
 
+        const {inmueble} = this.state;
+        const {id} = this.props.match.params;
+
+        //agregar un nombre dinamico por cada imagen que necesites subir al firestorage
+        Object.keys(imagenes).forEach(key => {
+            let codigoDinamico = uuid.v4();
+            let nombreImagen = imagenes[key].name;
+            let extension = nombreImagen.split(".").pop();
+            imagenes[key].alias =(nombreImagen.split(".")[0]+"_" + codigoDinamico +"." + extension).replace(/\s/g,"_").toLowerCase();
+        })
+
+        this.props.firebase.guardarDocumentos(imagenes).then(urlImagenes => {
+            inmueble.fotos = inmueble.fotos.concat(urlImagenes);
+
+            this.props.firebase.db
+                .collection("Inmuebles")
+                .doc(id)
+                .set(inmueble,{merge: true})
+                .then (success =>{
+                    this.setState({
+                        inmueble
+                    })
+                })
+        })
     }
 
-    eliminarFoto = foto => () => {
+    eliminarFoto = fotoUrl => async () => {
 
+        const {inmueble} = this.state;
+        const {id} = this.props.match.params;
+
+        let fotoID = fotoUrl.match(/[\w-]+.(jpg|png|jpeg|gif|svg)/);
+        fotoID = fotoID[0];
+
+        await this.props.firebase.eliminarDocumento(fotoID);
+
+        let fotoList = this.state.inmueble.fotos.filter(foto => {
+            return foto !== fotoUrl;
+        })
+
+        inmueble.fotos =fotoList;
+
+        this.props.firebase.db
+            .collection("Inmuebles")
+            .doc(id)
+            .set(inmueble, {merge: true})
+            .then(success => {
+                this.setState ({
+                    inmueble
+                })
+            })
+    }
+
+    async componentDidMount() {
+        const {id} = this.props.match.params;
+        
+        const inmuebleCollection = this.props.firebase.db.collection("Inmuebles");
+        const inmuebleDB = await inmuebleCollection.doc(id).get();
+
+        this.setState({
+            inmueble : inmuebleDB.data()
+        })
+    }
+
+    guardarInmueble = () => {
+        const {inmueble} = this.state;
+        const {id} = this.props.match.params;
+
+        const textoBusqueda = inmueble.direccion +" " + inmueble.ciudad + " " + inmueble.pais;
+
+        const keywords = crearKeyword(textoBusqueda);
+
+        inmueble.keywords = keywords;
+
+        this.props.firebase.db
+            .collection("Inmuebles")
+            .doc(id)
+            .set(inmueble, {merge:true})
+            .then (success =>{
+                this.props.history.push("/");
+            })
     }
 
     render() {
+
+        let uniqueID = uuid.v4();
         return (
             <Container style={style.container}>
                 <Paper style={style.paper}>
@@ -132,7 +213,7 @@ class EditarInmueble extends Component {
                     <Grid container justify="center">
                         <Grid item xs={12} sm={6}>
                             <ImageUploader 
-                                key={1000}
+                                key={uniqueID}
                                 withIcon={true}
                                 buttonText="Selecciones su imagen"
                                 onChange={this.subirImagenes}                            
@@ -175,6 +256,7 @@ class EditarInmueble extends Component {
                                 size="large"
                                 color="primary"
                                 style={style.submit}
+                                onClick={this.guardarInmueble}
                             >
                                 Guardar
                             </Button>
