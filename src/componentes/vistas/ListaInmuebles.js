@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import Button from'@material-ui/core/Button';
-import { Container, Paper, Grid, Breadcrumbs, Link, Typography, TextField, CardMedia, Card, CardContent, CardActions } from '@material-ui/core';
+import { Container, Paper, Grid, Breadcrumbs, Link, Typography, TextField, CardMedia, Card, CardContent, CardActions, ButtonGroup } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import { consumerFirebase } from '../../server';
 import logo from '../../logo.svg';
+import ArrowLeft from '@material-ui/icons/ArrowLeft';
+import ArrowRight from '@material-ui/icons/ArrowRight';
 
 const style = {
     cardGrid : {
@@ -31,6 +33,9 @@ const style = {
     },
     cardContent : {
         flexGrow : 1
+    },
+    barraBoton : {
+        marginTop: "20px"
     }
 }
 
@@ -148,6 +153,18 @@ class ListaInmuebles extends Component {
                         />
                     </Grid>
 
+                    <Grid item xs={12} sm={12} style={style.barraBoton}>
+                        <Grid container spacing={1} direction="column" alignItems="flex-end">
+                            <ButtonGroup size="small" aria-label="Small outlined group">
+                                <Button>
+                                    <ArrowLeft/>
+                                </Button>
+                                <Button>
+                                    <ArrowRight/>
+                                </Button>
+                            </ButtonGroup>
+                        </Grid>
+                    </Grid>
                     <Grid item xs={12} sm={12} style={style.gridTextfield}>
                         <Grid container spacing={4}>
                             {this.state.inmuebles.map(card => (
