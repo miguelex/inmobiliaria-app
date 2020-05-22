@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import Button from'@material-ui/core/Button';
 import { Container, Paper, Grid, Breadcrumbs, Link, Typography, TextField, CardMedia, Card, CardContent, CardActions, ButtonGroup } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
-import { consumerFirebase } from '../../server';
+import Firebase, { consumerFirebase } from '../../server';
 import logo from '../../logo.svg';
 import ArrowLeft from '@material-ui/icons/ArrowLeft';
 import ArrowRight from '@material-ui/icons/ArrowRight';
+import { obtenerData, obtenerDataAnterior } from '../../sesion/actions/InmuebleAction';
 
 const style = {
     cardGrid : {
@@ -43,7 +44,10 @@ class ListaInmuebles extends Component {
     
     state = {
         inmuebles : [],
-        textoBusqueda :""
+        textoBusqueda : "",
+        paginas : [],
+        paginaSize : 1,
+        casaInicial : null 
     }
 
     cambiarBusquedaTexto = e => {
@@ -61,45 +65,95 @@ class ListaInmuebles extends Component {
             name: e.target.value,
             typing: false,
             typingTimeout: setTimeout (goTime => {
-                let objectQuery = this.props.firebase.db
-                .collection("Inmuebles")
-                .orderBy("direccion")
-                .where("keywords","array-contains", self.state.textoBusqueda.toLowerCase());
+                
+                const firebase = this.props.firebase;
+                const {paginaSize} = this.state;
+ 
+                obtenerDataAnterior(firebase, paginaSize, 0, self.state.textoBusqueda).then(firebaseReturnData => {
+                    const pagina = {
+                        inicialValor : firebaseReturnData.inicialValor,
+                        finalValor: firebaseReturnData.finalValor
+                    }
 
-                if(self.state.textoBusqueda.trim()===""){
-                    objectQuery = this.props.firebase.db
-                    .collection("Inmuebles")
-                    .orderBy("direccion")
-                }
-
-                objectQuery.get().then(snapshot =>{
-                    const arrayInmueble = snapshot.docs.map(doc => {
-                        let data = doc.data();
-                        let id = doc.id;
-                        return {id, ...data};
-                    })
+                    const paginas = [];
+                    paginas.push(pagina);
 
                     this.setState({
-                        inmuebles: arrayInmueble
+                        paginaActual : 0,
+                        paginas,
+                        inmuebles : firebaseReturnData.arrayInmuebles
                     })
                 })
             }, 500)
         })
     }
 
-    async componentDidMount(){
-        let objectQuery = this.props.firebase.db.collection("Inmuebles").orderBy("direccion");
+    anteriorPagina = () => {
+        const {paginaActual, paginaSize, textoBusqueda,paginas} = this.state;
 
-        const snapshot = await objectQuery.get();
+        if (paginaActual > 0) {
+            const firebase = this.props.firebase;
 
-        const arrayInmueble = snapshot.docs.map (doc => {
-            let data = doc.data();
-            let id = doc.id;
-            return {id, ...data};
+            obtenerDataAnterior (firebase, paginaSize, paginas[paginaActual -1].inicialValor, textoBusqueda).then(firebaseReturnData => {
+
+                const pagina = {
+                    inicialValor : firebaseReturnData.inicialValor,
+                    finalValor : firebaseReturnData.finalValor
+                }
+
+                paginas.push(pagina);
+
+                this.setState({
+                    paginas,
+                    paginaActual : paginaActual -1,
+                    inmuebles : firebaseReturnData.arrayInmuebles
+                })
+            })
+        }
+    }
+
+    siguientePagina = () => {
+        const {paginaActual, paginaSize, textoBusqueda,paginas} = this.state;
+
+        const firebase = this.props.firebase;
+
+        obtenerData(firebase, paginaSize, paginas[paginaActual].finalValor, textoBusqueda).then(firebaseReturnData => {
+
+            if(firebaseReturnData.arrayInmuebles.length > 0) {
+                const pagina = {
+                    inicialValor : firebaseReturnData.inicialValor,
+                    finalValor : firebaseReturnData.finalValor
+                }
+
+                paginas.push(pagina);
+
+                this.setState({
+                    paginas,
+                    paginaActual : paginaActual +1,
+                    inmuebles : firebaseReturnData.arrayInmuebles
+                })
+            }
         })
+    }
+    async componentDidMount(){
+        
+        const {paginaSize, textoBusqueda, casaInicial, paginas} = this.state;
 
-        this.setState({
-            inmuebles: arrayInmueble
+        const firebase = this.props.firebase;
+
+        const firebaseReturnData = await obtenerData (firebase, paginaSize, casaInicial, textoBusqueda); 
+
+        const pagina = {
+            inicialValor : firebaseReturnData.inicialValor,
+            finalValor : firebaseReturnData.finalValor
+        }
+
+        paginas.push(pagina);
+
+        this.setState ({
+            inmuebles : firebaseReturnData.arrayInmuebles,
+            paginas,
+            paginaActual: 0
         })
     }
 
@@ -156,10 +210,10 @@ class ListaInmuebles extends Component {
                     <Grid item xs={12} sm={12} style={style.barraBoton}>
                         <Grid container spacing={1} direction="column" alignItems="flex-end">
                             <ButtonGroup size="small" aria-label="Small outlined group">
-                                <Button>
+                                <Button onClick={this.anteriorPagina}>
                                     <ArrowLeft/>
                                 </Button>
-                                <Button>
+                                <Button onClick={this.siguientePagina}>
                                     <ArrowRight/>
                                 </Button>
                             </ButtonGroup>
