@@ -78,7 +78,13 @@ class BarSession extends Component {
         const { classes } = this.props;
         const [{sesion}, dispatch] = this.context;
         const {usuario} = sesion;
+        
         let textoUsuario = usuario.nombre + " " + usuario.apellidos;
+
+        if (!usuario.nombre) {
+            textoUsuario = usuario.telefono;
+        }
+        
 
         return (
             <div>

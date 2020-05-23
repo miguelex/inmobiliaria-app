@@ -15,6 +15,7 @@ import RutaAutenticada from './componentes/seguridad/RutaAutenticada';
 import PerfilUsuario from './componentes/seguridad/PerfilUsuario';
 import NuevoInmueble from './componentes/vistas/NuevoInmueble';
 import EditarInmueble from './componentes/vistas/EditarInmueble';
+import LoginTelefono from './componentes/seguridad/LoginTelefono';
 
 function App(props) {
   let firebase = React.useContext(FirebaseContext);
@@ -63,6 +64,7 @@ function App(props) {
               <RutaAutenticada exact path="/inmueble/:id" autenticadoFirebase={firebase.auth.currentUser} component = {EditarInmueble}/>
               <Route path="/auth/registrarUsuario" exact component = {RegistrarUsuario}/>
               <Route path="/auth/login" exact component = {Login}/>
+              <Route path="/auth/loginTelefono" exact component = {LoginTelefono}/>
             </Switch>
           </Grid>
         </MuiThemeProvider>
